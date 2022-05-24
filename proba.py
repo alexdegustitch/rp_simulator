@@ -1,7 +1,10 @@
 from tkinter import *
+from tkinter.ttk import *
 from math import sin
+import tkinter
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from numpy import linspace
 import utils
 import networkx as nx
 from tkinter import messagebox
@@ -54,12 +57,9 @@ Label(root, text="Enter number of edges:").grid(row=6, column=0)
 num_edges_entry = Entry(root, width=5)
 num_edges_entry.grid(row=6, column=1)
 
-
-
-
 f = plt.figure(figsize=(9, 8))
 a = f.add_subplot(111)
-plt.axis("off")
+a.axis("off")
 pos = nx.circular_layout(G)
 nx.draw_networkx(G, pos=pos, ax=a, with_labels=True)
 
@@ -69,6 +69,7 @@ ylim = a.get_ylim()
 canvas = FigureCanvasTkAgg(f, master=root)
 canvas.draw()
 canvas.get_tk_widget().grid(row=9, column=0, columnspan=2, sticky=NSEW)
+
 
 
 def update_graph(event=None):
@@ -81,8 +82,7 @@ def update_graph(event=None):
     nx.draw_networkx(G, pos=nx.circular_layout(G), ax=a, with_labels=True)
     a.set_xlim(xlim)
     a.set_ylim(ylim)
-
-    plt.axis("off")
+    a.axis("off")
     canvas.draw()
 
     return None
@@ -95,12 +95,29 @@ def on_closing():
 
 
 def compute_rp(event=None):
+    global root
+    popup = Toplevel(root)
+    root.eval(f'tk::PlaceWindow {str(popup)} center')
+    Label(popup, text="Reliability Polynomial is being computed").grid(row=0,column=0)
+    progress = 0
+    progress_var = DoubleVar()
+    progress_bar = Progressbar(popup, variable=progress_var, maximum=100)
+    progress_bar.grid(row=1, column=0)
+    popup.pack_slaves()
+
+    
     res = 0
     U = int(u_entry.get())
     P = float(probability_entry.get())
 
+    progress_step = float(100.0/U)
     for i in range(U):
         res += utils.reliability_polynomial(G, P)
+        popup.update()
+        progress += progress_step
+        progress_var.set(progress)
+    popup.destroy()
+    
     res = res / U
     label_rp.configure(text=str(res))
     return None
@@ -118,7 +135,36 @@ def test_monte_carlo(event=None):
     return None
 
 def generate_fun(event = None):
-    pass
+    global G
+    global root
+
+    popup = Toplevel(root)
+    root.eval(f'tk::PlaceWindow {str(popup)} center')
+    Label(popup, text="Reliability Polynomial is being drawn").grid(row=0,column=0)
+    progress = 0
+    progress_var = DoubleVar()
+    progress_bar = Progressbar(popup, variable=progress_var, maximum=100)
+    progress_bar.grid(row=1, column=0)
+    popup.pack_slaves()
+
+    p_values = linspace(0, 1, num=101)
+    rp_values = []
+    s = 100
+    progress_step = float(100.0/s)
+    for p in p_values:
+        res = 0
+        for i in range(s):
+            res += utils.reliability_polynomial(G, p)
+        res = res / s
+        rp_values.append(res)
+        popup.update()
+        progress += progress_step
+        progress_var.set(progress)
+    popup.destroy()
+    fig, ax = plt.subplots()
+    ax.plot(p_values, rp_values)
+    fig.show()
+    
 
 # RP button
 buttonCalculateRP = Button(root, text="Compute RP", command=compute_rp)
@@ -137,6 +183,7 @@ buttonGenerateFun = Button(root, text="Generate function", command=generate_fun)
 buttonGenerateFun.grid(row=8, column=1)
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
+root.eval('tk::PlaceWindow . center')
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(2, weight=1)
 root.mainloop()
