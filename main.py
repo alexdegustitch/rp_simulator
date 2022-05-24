@@ -1,8 +1,10 @@
-import networkx as nx
-import matplotlib.pyplot as plt
-from numpy import double
-import utils
 import datetime
+
+import matplotlib.pyplot as plt
+import networkx as nx
+from numpy import double
+
+import utils
 
 p = double(input())
 s = int(input())
@@ -29,3 +31,5 @@ res_test = res_test / s
 b = datetime.datetime.now()
 c = b - a
 print("MC:", res_test, "TIME:", c.seconds, "sekundi i", c.microseconds, "mikrosekundi")
+
+

@@ -1,13 +1,10 @@
-from asyncio.windows_events import NULL
 import math
-from random import choice
-from re import L
-import networkx as nx
-from random import randint
-from random import random
-from random import shuffle
 from itertools import chain
-import datetime
+from random import randint, random, shuffle
+
+
+import networkx as nx
+
 
 def graph(N = 4, M = -1):
     if M < 0:
@@ -31,7 +28,7 @@ def graph(N = 4, M = -1):
     return G
 
 def graph_from_file(file_path = "initial_graph.txt"):
-    G = NULL
+    G = nx.Graph()
     with open(file = file_path, mode = 'r') as f:
         N = int(f.readline())
         G = nx.empty_graph(N)
@@ -58,41 +55,6 @@ def find_not_bridges(G, root = None):
             not_bridges.append((u, v))
     return not_bridges
 
-def dfs(G, low, pre, cnt, u, v, not_bridges):
-    pre[v] = cnt
-    cnt += 1
-    low[v] = pre[v]
-    for w in G.adj[v].keys():
-        if pre[w] == -1:
-            dfs(G, low, pre, cnt, v, w, not_bridges)
-            low[v] = min(low[v], low[w])
-            if low[w] == pre[w]: 
-                v1 = w
-                v2 = v
-                for e in not_bridges:
-                    if (e[0] == v1 and e[1] == v2): 
-                        not_bridges.remove((v1, v2))
-                        break
-                    if (e[0] == v2 and e[1] == v1):
-                        not_bridges.remove((v2, v1))
-                        break            
-        elif w != u:
-            low[v] = min(low[v], pre[w])
-    
-def find_not_bridges_my(G):
-    G = nx.Graph(G.copy())
-    not_bridges = set(G.edges())
-    low = []
-    pre = []
-    cnt = 0
-    for v in range(0, G.number_of_nodes()):
-        low.append(-1)
-        pre.append(-1)
-    for v in range(0, G.number_of_nodes()):
-        if pre[v] == -1:
-            dfs(G, low, pre, cnt, v, v, not_bridges)
-    return list(not_bridges)
-    
 def reliability_polynomial(G, p):
     G = nx.Graph(G.copy())
     if not nx.is_connected(G):
@@ -105,7 +67,7 @@ def reliability_polynomial(G, p):
 
     for k in range(1, M - N + 2):
 
-        not_bridges = find_not_bridges_my(G)
+        not_bridges = find_not_bridges(G)
       
         connected_subgraphs_cnt.append(len(not_bridges))
 
