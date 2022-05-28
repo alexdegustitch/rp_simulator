@@ -85,7 +85,34 @@ def reliability_polynomial(G, p):
         num = n_i_coeficient[i] * math.pow(p, i) * math.pow(1 - p, M - i)
         res += num
 
-    return res    
+    return res
+
+def get_polynomial(G):
+    G = nx.Graph(G.copy())
+    if not nx.is_connected(G):
+        return 0
+    
+    N = G.number_of_nodes()
+    M = G.number_of_edges()
+
+    connected_subgraphs_cnt = [1]
+
+    for k in range(1, M - N + 2):
+
+        not_bridges = find_not_bridges(G)
+      
+        connected_subgraphs_cnt.append(len(not_bridges))
+
+        edge_to_remove = not_bridges[randint(0, len(not_bridges) - 1)]
+        G.remove_edge(edge_to_remove[0], edge_to_remove[1])
+    
+    n_i_coeficient = [0 for i in range(0, M + 1)]
+
+    n_i_coeficient[M] = 1
+    for k in range(1, M - N + 2):
+        n_i_coeficient[M - k] = n_i_coeficient[M - k + 1] * connected_subgraphs_cnt[k] / k
+
+    return n_i_coeficient     
 
 def monte_carlo_method(G, p):
     G = G.copy()
