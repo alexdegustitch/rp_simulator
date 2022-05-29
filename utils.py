@@ -2,11 +2,10 @@ import math
 from itertools import chain
 from random import randint, random, shuffle
 
-
 import networkx as nx
 
 
-def graph(N = 4, M = -1):
+def graph(N=4, M=-1):
     if M < 0:
         M = randint(0, N * (N - 1) / 2 - N + 1)
     elif M >= 0 and M < N - 1:
@@ -14,7 +13,7 @@ def graph(N = 4, M = -1):
     elif M > N * (N - 1) / 2:
         return nx.complete_graph(N)
     else:
-        M -= (N - 1)
+        M -= N - 1
     edges = []
     G = nx.path_graph(N)
     for i in range(1, N - 1):
@@ -27,21 +26,23 @@ def graph(N = 4, M = -1):
         G.add_edge(i_node, j_node)
     return G
 
-def graph_from_file(file_path = "initial_graph.txt"):
+
+def graph_from_file(file_path="initial_graph.txt"):
     G = nx.Graph()
-    with open(file = file_path, mode = 'r') as f:
+    with open(file=file_path, mode="r") as f:
         N = int(f.readline())
         G = nx.empty_graph(N)
         for line in f:
-            edge = tuple(line.split(' '))
+            edge = tuple(line.split(" "))
             v1 = int(edge[0])
             v2 = int(edge[1])
-            if(0 <= v1 and v1 < N and 0 <= v2 and v2 < N):
+            if 0 <= v1 and v1 < N and 0 <= v2 and v2 < N:
                 G.add_edge(int(edge[0]), int(edge[1]))
 
     return G
 
-def find_not_bridges(G, root = None):
+
+def find_not_bridges(G, root=None):
     multigraph = G.is_multigraph()
     H = nx.Graph(G) if multigraph else G
     chains = nx.chain_decomposition(H, root=root)
@@ -55,11 +56,12 @@ def find_not_bridges(G, root = None):
             not_bridges.append((u, v))
     return not_bridges
 
+
 def reliability_polynomial(G, p):
     G = nx.Graph(G.copy())
     if not nx.is_connected(G):
         return 0
-    
+
     N = G.number_of_nodes()
     M = G.number_of_edges()
 
@@ -68,17 +70,19 @@ def reliability_polynomial(G, p):
     for k in range(1, M - N + 2):
 
         not_bridges = find_not_bridges(G)
-      
+
         connected_subgraphs_cnt.append(len(not_bridges))
 
         edge_to_remove = not_bridges[randint(0, len(not_bridges) - 1)]
         G.remove_edge(edge_to_remove[0], edge_to_remove[1])
-    
+
     n_i_coeficient = [0 for i in range(0, M + 1)]
 
     n_i_coeficient[M] = 1
     for k in range(1, M - N + 2):
-        n_i_coeficient[M - k] = n_i_coeficient[M - k + 1] * connected_subgraphs_cnt[k] / k
+        n_i_coeficient[M - k] = (
+            n_i_coeficient[M - k + 1] * connected_subgraphs_cnt[k] / k
+        )
 
     res = 0
     for i in range(len(n_i_coeficient)):
@@ -87,11 +91,12 @@ def reliability_polynomial(G, p):
 
     return res
 
+
 def get_polynomial(G):
     G = nx.Graph(G.copy())
     if not nx.is_connected(G):
         return 0
-    
+
     N = G.number_of_nodes()
     M = G.number_of_edges()
 
@@ -100,19 +105,22 @@ def get_polynomial(G):
     for k in range(1, M - N + 2):
 
         not_bridges = find_not_bridges(G)
-      
+
         connected_subgraphs_cnt.append(len(not_bridges))
 
         edge_to_remove = not_bridges[randint(0, len(not_bridges) - 1)]
         G.remove_edge(edge_to_remove[0], edge_to_remove[1])
-    
+
     n_i_coeficient = [0 for i in range(0, M + 1)]
 
     n_i_coeficient[M] = 1
     for k in range(1, M - N + 2):
-        n_i_coeficient[M - k] = n_i_coeficient[M - k + 1] * connected_subgraphs_cnt[k] / k
+        n_i_coeficient[M - k] = (
+            n_i_coeficient[M - k + 1] * connected_subgraphs_cnt[k] / k
+        )
 
-    return n_i_coeficient     
+    return n_i_coeficient
+
 
 def monte_carlo_method(G, p):
     G = G.copy()
