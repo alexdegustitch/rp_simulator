@@ -153,7 +153,7 @@ def compute_rp(event=None):
     popup.protocol("WM_DELETE_WINDOW", on_closing_compute_rp)
     root.eval(f"tk::PlaceWindow {str(popup)} center")
 
-    tk.Label(popup, text="Reliability Polynomial is being computed").grid(
+    tk.Label(popup, text="Reliability polynomial is being computed").grid(
         row=0, column=0
     )
     progress = 0
@@ -191,7 +191,7 @@ def test_monte_carlo(event=None):
     popup.protocol("WM_DELETE_WINDOW", on_closing_monte_carlo)
     root.eval(f"tk::PlaceWindow {str(popup)} center")
 
-    tk.Label(popup, text="Monte Carlo simulation in process").grid(row=0, column=0)
+    tk.Label(popup, text="Monte Carlo simulation in the progress").grid(row=0, column=0)
 
     progress = 0
     progress_var = tk.DoubleVar()
@@ -229,7 +229,7 @@ def generate_fun(event=None):
     popup.protocol("WM_DELETE_WINDOW", on_closing_generate_fun)
     # root.eval(f'tk::PlaceWindow {str(popup)} center')
     root.eval(f"tk::PlaceWindow {str(popup)} center")
-    tk.Label(popup, text="Reliability Polynomial is being drawn").grid(row=0, column=0)
+    tk.Label(popup, text="Reliability polynomial is being plotted").grid(row=0, column=0)
     progress = 0
     progress_var = tk.DoubleVar()
     progress_bar = ttk.Progressbar(popup, variable=progress_var, maximum=100)
@@ -238,7 +238,7 @@ def generate_fun(event=None):
 
     p_values = linspace(0, 1, num=101)
     rp_values = []
-    accuracy = "small"
+    accuracy = "low"
     s = 50
     if opt.get() == 2:
         s = 500
@@ -279,7 +279,7 @@ def generate_fun(event=None):
     popup.destroy()
     fig, ax = plt.subplots()
     fig.canvas.manager.set_window_title(
-        "Function of reliability polynomial - " + accuracy + " accuracy"
+        "Reliability polynomial function - " + accuracy + " accuracy"
     )
     # fig.suptitle('Function of reliability polynomial - ' + accuracy  +' accuracy',fontsize = 12)
     ax.set_xlabel(r"$p$")
@@ -298,7 +298,7 @@ def accuracy_fun(event=None):
     opt.set(2)
     root.eval(f"tk::PlaceWindow {str(accuracy_popup)} center")
 
-    R1 = tk.Radiobutton(accuracy_popup, text="Small", variable=opt, value=1)
+    R1 = tk.Radiobutton(accuracy_popup, text="Low", variable=opt, value=1)
     R1.pack(anchor=tk.W)
 
     R2 = tk.Radiobutton(accuracy_popup, text="Medium", variable=opt, value=2)
@@ -320,14 +320,14 @@ buttonCalculateRP.grid(row=2, column=0, sticky=tk.E, padx=(0, 10))
 
 # Test button
 buttonMonteCarlo = tk.Button(
-    left_frame, text="Test", command=test_monte_carlo, state=tk.DISABLED, font=font
+    left_frame, text="Monte Carlo", command=test_monte_carlo, state=tk.DISABLED, font=font
 )
 buttonMonteCarlo.grid(row=4, column=0, sticky=tk.E, padx=(0, 10))
 
 # Generate graph
 buttonGenerateGraph = tk.Button(
     left_frame,
-    text="Generate new Graph",
+    text="Generate Graph",
     command=update_graph,
     state=tk.DISABLED,
     font=font,
@@ -336,7 +336,7 @@ buttonGenerateGraph.grid(row=7, column=1, sticky=tk.W, padx=(10, 0))
 
 # Generate graph
 buttonGenerateFun = tk.Button(
-    left_frame, text="Generate function", command=accuracy_fun, font=font
+    left_frame, text="Generate Function", command=accuracy_fun, font=font
 )
 buttonGenerateFun.grid(row=8, column=1, sticky=tk.W, padx=(10, 0))
 
